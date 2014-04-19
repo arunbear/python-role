@@ -1,4 +1,4 @@
-from inspect import isfunction
+from inspect import getmembers, isfunction
 
 def consume(*roles):
     def deco(cls):
@@ -8,7 +8,5 @@ def consume(*roles):
     return deco
 
 def _add_methods(role, cls):
-    for attr in dir(role): 
-        val = getattr(role, attr)
-        if isfunction(val):
-            setattr(cls, attr, val)
+    for attr, val in getmembers(role, isfunction): 
+        setattr(cls, attr, val)
