@@ -9,4 +9,5 @@ def consume(*roles):
 
 def _add_methods(role, cls):
     for attr, val in getmembers(role, isfunction): 
-        setattr(cls, attr, val)
+        if not hasattr(cls, attr):
+            setattr(cls, attr, val)
