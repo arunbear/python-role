@@ -1,4 +1,5 @@
 import unittest
+import role.test.hacker
 import role.test.messenger
 import role.test.passenger
 
@@ -25,6 +26,29 @@ class RoleTester(unittest.TestCase):
         self.assertEqual(obj.introduce(), 'I am the passenger')
         self.assertEqual(obj.how(), 'I am fine')
         self.assertEqual(obj.bye(), 'bye bye world')
+
+    def test_conflict_managed_separately(self):
+        @consume(role.test.hacker)
+        @consume(role.test.passenger)
+        class Foo(object):
+            pass
+        obj = Foo()
+        self.assertEqual(obj.introduce(), 'I am the passenger')
+
+    def test_conflict_managed(self):
+        @consume(role.test.hacker, role.test.passenger)
+        class Foo(object):
+            def introduce(self):
+                return 'I am somebody'
+        obj = Foo()
+        self.assertEqual(obj.introduce(), 'I am somebody')
+
+    def test_conflict_unmanaged(self):
+        with self.assertRaisesRegexp(NameError, 'conflicts with'):
+            @consume(role.test.hacker, role.test.passenger)
+            class Foo(object):
+                def talk(self):
+                    return self.introduce()
 
 if __name__ == '__main__':
     unittest.main()
