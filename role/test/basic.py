@@ -1,5 +1,6 @@
 import unittest
 import role.test.hacker
+import role.test.interface
 import role.test.messenger
 import role.test.passenger
 
@@ -49,6 +50,21 @@ class RoleTester(unittest.TestCase):
             class Foo(object):
                 def talk(self):
                     return self.introduce()
+
+    def test_requirements_managed(self):
+        @consume(role.test.interface, role.test.passenger)
+        class Foo(object):
+            def walk(self):
+                return 'Walking along'
+        obj = Foo()
+        self.assertEqual(obj.talk(), 'I am the passenger')
+        self.assertEqual(obj.walk(), 'Walking along')
+
+    def test_requirements_unmanaged(self):
+        with self.assertRaisesRegexp(TypeError, 'which is required by'):
+            @consume(role.test.interface, role.test.passenger)
+            class Foo(object):
+                pass
 
 if __name__ == '__main__':
     unittest.main()
